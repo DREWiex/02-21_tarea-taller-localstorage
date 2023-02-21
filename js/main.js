@@ -33,7 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   ]
 
-
+  const arrayProductosEnStorage = [];
 
 
   //*** EVENTOS ***//
@@ -103,10 +103,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const captureAddButton = document.querySelectorAll('.agregar');
 
-    arrayProductos.forEach((item) => {
-      console.log(item.id); //! aquí tengo que buscar la forma de comparar el key "id" del objeto con el atributo data-id del botón, y en caso de que coincidan, dar la orden para setItem
-    })
-
     //localStorage.setItem("producto", JSON.stringify(arrayProductos))
 
     console.log('Estoy capturando el botón "Añadir"')
@@ -140,7 +136,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   pintarProductos();
-  addProdStorage();
 
 });//LOAD
 
