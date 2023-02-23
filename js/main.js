@@ -47,15 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });//!EV-AGREGARPROD
 
 
-  listaDeProductos.addEventListener('click', (ev) => {
-
-    if(ev.target.classList.contains('quitar')){
-      delProdStorage();
-    }
-
-  })//!EV-QUITARPROD
-
-
+/*
   listaDeProductos.addEventListener("click", (ev) => {
 
     if(ev.target.classList.contains("quitar-todo")){
@@ -63,7 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
   })//!EV-BORRARTODO
-
+*/
 
 
 
