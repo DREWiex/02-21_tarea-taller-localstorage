@@ -12,38 +12,38 @@ document.addEventListener('DOMContentLoaded', () => {
   //*** VARIABLES ***//
 
   const fragment = document.createDocumentFragment();
+  const tablaProductos = document.querySelector('#lista-productos');
+  const tablaSeleccionados = document.querySelector('#productos-seleccionados');
 
   const arrayProductos = [
-    { id: 'a-1', fruta: 'Plátano' },
-    { id: 'a-2', fruta: 'Fresa' },
-    { id: 'a-3', fruta: 'Coco' },
-    { id: 'a-4', fruta: 'Melón' }
+    { id: 'a-1', fruta: 'Plátano', cantidad: 1 },
+    { id: 'a-2', fruta: 'Fresa', cantidad: 1 },
+    { id: 'a-3', fruta: 'Coco', cantidad: 1 },
+    { id: 'a-4', fruta: 'Melón', cantidad: 1 },
   ];
 
   const arrayProductosSeleccionados = JSON.parse(localStorage.getItem('productos')) || [];
 
 
-
+  
   //*** EVENTOS ***//
 
-  document.addEventListener("click", ({target}) => { //! incompleto
+  document.addEventListener("click", ({target}) => {
     
-    if(target.matches('.agregar')){ //* capturo el botón de añadir
-      const id = target.parentElement.id; //* capturo el id del elemento padre (<li> > <button>)
-      addProdStorage(id); //* paso como argumento el atributo id del elemento padre y la función lo compara con la propiedad id de los objetos hasta que coincide y hace el push() en el arrayProductosEncontrados, además de subirlo al localStorage (ver bloque de instrucción de la función)
-      pintarListaDos(); //* pinta en la segunda lista los productos añadidos al localStorage
-    }
+    if(target.matches('#add')){
+      const id = target.dataset.id;
+      almacenarProducto(id);
+    };
 
-    if(target.matches('.quitar')){
-      const id = target.parentElement.id;
-      //delProdStorage(id);
-      //pintarListaDos();
-    }
+    if(target.matches('#delete')){
+      const id = target.dataset.id;
+      eliminarProducto(id);
+    };
 
-    if(target.matches('.quitar-todo')){
-      //localStorage.clear();
-      //pintarListaDos();
-    }
+    if(target.matches('#del-all')){
+      localStorage.clear();
+      location.reload();
+    };
 
   });//!EV-CLICK
 
@@ -51,77 +51,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
   //*** FUNCIONES ***//
 
-  const pintarListaUno = () => {
+  const pintarProductos = () => {
     
     arrayProductos.forEach((item) => {
-        const itemList = document.createElement('LI');
-        itemList.id = item.id;
-        itemList.textContent = item.fruta;
-        const addButton = document.createElement('BUTTON');
-        addButton.textContent = "Añadir";
-        addButton.classList.add('agregar');
-        addButton.setAttribute("data-id", item.id);
-        const delButton = document.createElement('BUTTON');
-        delButton.textContent = "Eliminar";
-        delButton.classList.add('quitar');
-        delButton.setAttribute("data-id", item.id);
+      const productoTR = document.createElement('TR');
+      const productoTD = document.createElement('TD');
+      productoTD.id = item.id;
+      productoTD.textContent = item.fruta;
+      const addBtnTD = document.createElement('TD');
+      const addBtn = document.createElement('BUTTON');
+      addBtn.textContent = "Añadir";
+      addBtn.id = 'add';
+      addBtn.dataset['id'] = item.id;
 
-        itemList.append(addButton, delButton);
+      addBtnTD.append(addBtn);
 
-        fragment.append(itemList);
+      productoTR.append(productoTD, addBtnTD);
 
-    })
+      fragment.append(productoTR);
+
+    });
+
+    tablaProductos.append(fragment);
     
-    const delAllButton = document.createElement('BUTTON');
-    delAllButton.classList.add('quitar-todo');
-    delAllButton.textContent = "Borrar todo"
-
-    lista1.append(fragment, delAllButton);
-
   }; //!FUNC-PINTARPRODUCTOS
-
-
-  const addProdStorage = (id) => {
-    
-    const productoEncontrado = arrayProductos.find((item)=> item.id == id);
-    arrayProductosSeleccionados.push(productoEncontrado);
-    setLocal();
-
-  }; //!FUNC-ADDPRODSTOR
-
-
-  const delProdStorage = (id) => { //! incompleto
-
-    const productoEncontrado = arrayProductosSeleccionados.find((item)=> item.id == id);
-    localStorage.removeItem('productos');
-
-  }; //!FUNC-DELPRODSTOR
-
-
-  const pintarListaDos = () => { //? incompleto
-    
-    lista2.innerHTML = '';
-    
-    const productos = getLocal();
-    
-    productos.forEach(({id, fruta}) => { //* destructuración de item (arrayProductosSeleccionados.id, arrayProductosSeleccionados.fruta)
-      const itemList = document.createElement('LI');
-        itemList.id = id;
-        itemList.textContent = fruta;
-        const delButton = document.createElement('BUTTON');
-        delButton.textContent = 'Eliminar';
-        delButton.classList.add('quitar');
-        delButton.setAttribute("data-id", id);
-
-        itemList.append(delButton);
-
-        fragment.append(itemList);
-
-    })
-    
-    lista2.append(fragment);
-
-  }; //!FUNC-PINTARLISTADOS
 
 
   const setLocal = () => {
@@ -131,17 +84,111 @@ document.addEventListener('DOMContentLoaded', () => {
   }; //!FUNC-SETLOCAL
 
 
-  const getLocal = () => {
+  const almacenarProducto = (id) => {
 
-    return JSON.parse(localStorage.getItem('productos')) || [];
+    const index = arrayProductosSeleccionados.findIndex( item => item.id == id);
 
-  }; //!FUNC-GETLOCAL
+    if(index == -1){ // no existe el producto en localStorage
+
+      const producto = arrayProductos.find( item => item.id == id);
+      
+      arrayProductosSeleccionados.push(producto);
+
+      setLocal();
+
+      pintarSeleccionados();
+
+    } else { // sí existe el producto en localStorage
+
+      const producto = arrayProductos.find( item => item.id == id);
+
+      producto.cantidad++;
+
+      setLocal();
+
+      pintarSeleccionados();
+
+    };
+    
+  }; //!FUNC-ALMACENARPRODUCTO
+
+
+  const pintarSeleccionados = () => {
+
+    tablaSeleccionados.innerHTML = '';
+        
+    arrayProductosSeleccionados.forEach((item) => {
+
+      const seleccionadoTR = document.createElement('TR');
+      
+      const seleccionadoTD = document.createElement('TD');
+      seleccionadoTD.id = item.id;
+      seleccionadoTD.textContent = item.fruta;
+      
+      const cantidadTD = document.createElement('P');
+      cantidadTD.textContent = item.cantidad;
+
+      const delBtnTD = document.createElement('TD');
+      const delBtn = document.createElement('BUTTON');
+      delBtn.id = 'delete';
+      delBtn.dataset['id'] = item.id;
+      delBtn.textContent = 'Eliminar';
+
+      delBtnTD.append(delBtn);
+
+      seleccionadoTR.append(seleccionadoTD, cantidadTD, delBtnTD);
+
+      fragment.append(seleccionadoTR);
+
+    });
+
+    const delAllBtnTR = document.createElement('TR');
+    const delAllBtnTD = document.createElement('TD');
+    delAllBtnTD.setAttribute('colspan', 3);
+    const delAllBtn = document.createElement('BUTTON');
+    delAllBtn.id = 'del-all';
+    delAllBtn.textContent = 'Borrar productos';
+
+    delAllBtnTD.append(delAllBtn);
+
+    delAllBtnTR.append(delAllBtnTD);
+
+    tablaSeleccionados.append(fragment, delAllBtnTR);
+    
+  }; //!FUNC-PINTARSELECCIONADOS
+
+
+  const eliminarProducto = (id) => {
+
+    const producto = arrayProductosSeleccionados.find( item => item.id == id);
+
+    if(producto.cantidad > 1){
+
+      producto.cantidad--
+
+      setLocal();
+
+      pintarSeleccionados();
+
+    } else {
+
+      const index = arrayProductosSeleccionados.findIndex( item => item.id == id);
+
+      arrayProductosSeleccionados.splice(index, 1);
+
+      setLocal();
+
+      pintarSeleccionados();
+
+    };
+
+  }; //!FUNC-ELIMINARPRODUCTO
 
 
   const init = () => {
 
-    pintarListaUno();
-    pintarListaDos(); 
+    pintarProductos();
+    pintarSeleccionados(); 
 
   }; //!FUNC-INIT
 
