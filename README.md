@@ -1,2 +1,1 @@
-# Taller-Web-Storage
-Ejercicio
+# Tarea: taller localStorage
