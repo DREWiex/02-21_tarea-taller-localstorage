@@ -12,7 +12,8 @@ document.addEventListener('DOMContentLoaded', () => {
   //*** VARIABLES ***//
 
   const fragment = document.createDocumentFragment();
-  const tabla = document.querySelector('#table-body');
+  const tablaProductos = document.querySelector('#lista-productos');
+  const tablaSeleccionados = document.querySelectorAll('#productos-seleccionados');
 
   const arrayProductos = [
     { id: 'a-1', fruta: 'Plátano' },
@@ -55,7 +56,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
     arrayProductos.forEach((item) => {
       const productosTR = document.createElement('TR');
-      productosTR.id = 'lista-productos';
       const productoTD = document.createElement('TD');
       productoTD.id = item.id;
       productoTD.textContent = item.fruta;
@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     });
 
-    tabla.append(fragment);
+    tablaProductos.append(fragment);
     
   }; //!FUNC-PINTARPRODUCTOS
 
@@ -97,11 +97,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const pintarListaDos = (id) => { //? incompleto
 
-    // id="lista-productos-seleccionados"
-    // lista2.innerHTML = '';
-    
-    // const productos = getLocal();
-    
+    tablaSeleccionados.innerHTML = '';
+        
     // productos.forEach(({id, fruta}) => { //* destructuración de item (arrayProductosSeleccionados.id, arrayProductosSeleccionados.fruta)
     //   const itemList = document.createElement('LI');
     //     itemList.id = id;
