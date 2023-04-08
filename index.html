@@ -10,27 +10,31 @@
     <body>
 
         <header>
-            <h1 class="margin">Lista de la compra</h1>
+            <h1 class="margin text-center">Lista de la compra</h1>
         </header>
 
         <main>
             <section>
-                <h2 class="margin">Productos:</h2>
 
-                <div>
-                    <ul id="lista1" class="margin">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Productos:</th>
+                            <th> <!-- add button --> </th>
+                            <th>Productos seleccionados:</th>
+                            <th> <!-- del button --> </th>
+                        </tr>
+                    </thead>
 
-                    </ul>
-                </div>
+                    <tbody id="table-body">
 
-                <div>
-                    <ul id="lista2">
-
-                    </ul>
-                </div>
+                    </tbody>
+                </table>
 
             </section>
         </main>
-        <script src="js/main.js"></script>
+
     </body>
+
+    <script src="js/main.js"></script>
 </html>

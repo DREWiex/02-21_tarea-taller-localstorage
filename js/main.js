@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
   //*** VARIABLES ***//
 
   const fragment = document.createDocumentFragment();
+  const tabla = document.querySelector('#table-body');
 
   const arrayProductos = [
     { id: 'a-1', fruta: 'Plátano' },
@@ -28,14 +29,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.addEventListener("click", ({target}) => { //! incompleto
     
-    if(target.matches('.agregar')){ //* capturo el botón de añadir
-      const id = target.parentElement.id; //* capturo el id del elemento padre (<li> > <button>)
-      addProdStorage(id); //* paso como argumento el atributo id del elemento padre y la función lo compara con la propiedad id de los objetos hasta que coincide y hace el push() en el arrayProductosEncontrados, además de subirlo al localStorage (ver bloque de instrucción de la función)
-      pintarListaDos(); //* pinta en la segunda lista los productos añadidos al localStorage
-    }
+    if(target.matches('.add')){
+      const id = target.dataset.id;
+      almacenarProducto(id);
+    };
 
     if(target.matches('.quitar')){
-      const id = target.parentElement.id;
+      // const id = target.parentElement.id;
       //delProdStorage(id);
       //pintarListaDos();
     }
@@ -51,75 +51,73 @@ document.addEventListener('DOMContentLoaded', () => {
 
   //*** FUNCIONES ***//
 
-  const pintarListaUno = () => {
+  const pintarProductos = () => {
     
     arrayProductos.forEach((item) => {
-        const itemList = document.createElement('LI');
-        itemList.id = item.id;
-        itemList.textContent = item.fruta;
-        const addButton = document.createElement('BUTTON');
-        addButton.textContent = "Añadir";
-        addButton.classList.add('agregar');
-        addButton.setAttribute("data-id", item.id);
-        const delButton = document.createElement('BUTTON');
-        delButton.textContent = "Eliminar";
-        delButton.classList.add('quitar');
-        delButton.setAttribute("data-id", item.id);
+      const productosTR = document.createElement('TR');
+      productosTR.id = 'lista-productos';
+      const productoTD = document.createElement('TD');
+      productoTD.id = item.id;
+      productoTD.textContent = item.fruta;
+      const buttonTD = document.createElement('TD');
+      const addBtn = document.createElement('BUTTON');
+      addBtn.textContent = "Añadir";
+      addBtn.classList.add('add');
+      addBtn.dataset['id'] = item.id;
 
-        itemList.append(addButton, delButton);
+      buttonTD.append(addBtn);
 
-        fragment.append(itemList);
+      productosTR.append(productoTD, buttonTD);
 
-    })
+      fragment.append(productosTR);
+
+    });
+
+    tabla.append(fragment);
     
-    const delAllButton = document.createElement('BUTTON');
-    delAllButton.classList.add('quitar-todo');
-    delAllButton.textContent = "Borrar todo"
-
-    lista1.append(fragment, delAllButton);
-
   }; //!FUNC-PINTARPRODUCTOS
 
 
-  const addProdStorage = (id) => {
+  const almacenarProducto = (id) => {
     
-    const productoEncontrado = arrayProductos.find((item)=> item.id == id);
-    arrayProductosSeleccionados.push(productoEncontrado);
+    const buscarProducto = arrayProductos.find( producto => producto.id == id);
+    arrayProductosSeleccionados.push(buscarProducto);
     setLocal();
 
-  }; //!FUNC-ADDPRODSTOR
+  }; //!FUNC-ALMACENARPRODUCTO
 
 
-  const delProdStorage = (id) => { //! incompleto
+  // const delProdStorage = (id) => { //! incompleto
 
-    const productoEncontrado = arrayProductosSeleccionados.find((item)=> item.id == id);
-    localStorage.removeItem('productos');
+  //   const productoEncontrado = arrayProductosSeleccionados.find((item)=> item.id == id);
+  //   localStorage.removeItem('productos');
 
-  }; //!FUNC-DELPRODSTOR
+  // }; //!FUNC-DELPRODSTOR
 
 
-  const pintarListaDos = () => { //? incompleto
+  const pintarListaDos = (id) => { //? incompleto
+
+    // id="lista-productos-seleccionados"
+    // lista2.innerHTML = '';
     
-    lista2.innerHTML = '';
+    // const productos = getLocal();
     
-    const productos = getLocal();
+    // productos.forEach(({id, fruta}) => { //* destructuración de item (arrayProductosSeleccionados.id, arrayProductosSeleccionados.fruta)
+    //   const itemList = document.createElement('LI');
+    //     itemList.id = id;
+    //     itemList.textContent = fruta;
+    //     const delButton = document.createElement('BUTTON');
+    //     delButton.textContent = 'Eliminar';
+    //     delButton.classList.add('quitar');
+    //     delButton.setAttribute("data-id", id);
+
+    //     itemList.append(delButton);
+
+    //     fragment.append(itemList);
+
+    // })
     
-    productos.forEach(({id, fruta}) => { //* destructuración de item (arrayProductosSeleccionados.id, arrayProductosSeleccionados.fruta)
-      const itemList = document.createElement('LI');
-        itemList.id = id;
-        itemList.textContent = fruta;
-        const delButton = document.createElement('BUTTON');
-        delButton.textContent = 'Eliminar';
-        delButton.classList.add('quitar');
-        delButton.setAttribute("data-id", id);
-
-        itemList.append(delButton);
-
-        fragment.append(itemList);
-
-    })
-    
-    lista2.append(fragment);
+    // lista2.append(fragment);
 
   }; //!FUNC-PINTARLISTADOS
 
@@ -140,7 +138,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const init = () => {
 
-    pintarListaUno();
+    pintarProductos();
     pintarListaDos(); 
 
   }; //!FUNC-INIT
