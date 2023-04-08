@@ -16,35 +16,34 @@ document.addEventListener('DOMContentLoaded', () => {
   const tablaSeleccionados = document.querySelector('#productos-seleccionados');
 
   const arrayProductos = [
-    { id: 'a-1', fruta: 'Plátano' },
-    { id: 'a-2', fruta: 'Fresa' },
-    { id: 'a-3', fruta: 'Coco' },
-    { id: 'a-4', fruta: 'Melón' }
+    { id: 'a-1', fruta: 'Plátano', cantidad: 1 },
+    { id: 'a-2', fruta: 'Fresa', cantidad: 1 },
+    { id: 'a-3', fruta: 'Coco', cantidad: 1 },
+    { id: 'a-4', fruta: 'Melón', cantidad: 1 },
   ];
 
   const arrayProductosSeleccionados = JSON.parse(localStorage.getItem('productos')) || [];
 
 
-
+  
   //*** EVENTOS ***//
 
-  document.addEventListener("click", ({target}) => { //! incompleto
+  document.addEventListener("click", ({target}) => {
     
-    if(target.matches('.add')){
+    if(target.matches('#add')){
       const id = target.dataset.id;
       almacenarProducto(id);
     };
 
-    if(target.matches('.quitar')){
-      // const id = target.parentElement.id;
-      //delProdStorage(id);
-      //pintarListaDos();
-    }
+    if(target.matches('#delete')){
+      const id = target.dataset.id;
+      eliminarProducto(id);
+    };
 
-    if(target.matches('.quitar-todo')){
-      //localStorage.clear();
-      //pintarListaDos();
-    }
+    if(target.matches('#del-all')){
+      localStorage.clear();
+      location.reload();
+    };
 
   });//!EV-CLICK
 
@@ -62,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const addBtnTD = document.createElement('TD');
       const addBtn = document.createElement('BUTTON');
       addBtn.textContent = "Añadir";
-      addBtn.classList.add('add');
+      addBtn.id = 'add';
       addBtn.dataset['id'] = item.id;
 
       addBtnTD.append(addBtn);
@@ -85,56 +84,105 @@ document.addEventListener('DOMContentLoaded', () => {
   }; //!FUNC-SETLOCAL
 
 
-  const getLocal = () => {
-
-    return JSON.parse(localStorage.getItem('productos')) || [];
-
-  }; //!FUNC-GETLOCAL
-
-
   const almacenarProducto = (id) => {
-    
-    const buscarProducto = arrayProductos.find( producto => producto.id == id);
-    arrayProductosSeleccionados.push(buscarProducto);
-    setLocal();
 
+    const index = arrayProductosSeleccionados.findIndex( item => item.id == id);
+
+    if(index == -1){ // no existe el producto en localStorage
+
+      const producto = arrayProductos.find( item => item.id == id);
+      
+      arrayProductosSeleccionados.push(producto);
+
+      setLocal();
+
+      pintarSeleccionados();
+
+    } else { // sí existe el producto en localStorage
+
+      const producto = arrayProductos.find( item => item.id == id);
+
+      producto.cantidad++;
+
+      setLocal();
+
+      pintarSeleccionados();
+
+    };
+    
   }; //!FUNC-ALMACENARPRODUCTO
 
 
-  // const delProdStorage = (id) => { //! incompleto
-
-  //   const productoEncontrado = arrayProductosSeleccionados.find((item)=> item.id == id);
-  //   localStorage.removeItem('productos');
-
-  // }; //!FUNC-DELPRODSTOR
-
-
-  const pintarSeleccionados = () => { //? incompleto
+  const pintarSeleccionados = () => {
 
     tablaSeleccionados.innerHTML = '';
         
     arrayProductosSeleccionados.forEach((item) => {
+
       const seleccionadoTR = document.createElement('TR');
+      
       const seleccionadoTD = document.createElement('TD');
       seleccionadoTD.id = item.id;
       seleccionadoTD.textContent = item.fruta;
+      
+      const cantidadTD = document.createElement('P');
+      cantidadTD.textContent = item.cantidad;
+
       const delBtnTD = document.createElement('TD');
       const delBtn = document.createElement('BUTTON');
-      delBtn.classList.add('quitar');
+      delBtn.id = 'delete';
       delBtn.dataset['id'] = item.id;
       delBtn.textContent = 'Eliminar';
 
       delBtnTD.append(delBtn);
 
-      seleccionadoTR.append(seleccionadoTD, delBtnTD);
+      seleccionadoTR.append(seleccionadoTD, cantidadTD, delBtnTD);
 
       fragment.append(seleccionadoTR);
 
     });
 
-    tablaSeleccionados.append(fragment);
+    const delAllBtnTR = document.createElement('TR');
+    const delAllBtnTD = document.createElement('TD');
+    delAllBtnTD.setAttribute('colspan', 3);
+    const delAllBtn = document.createElement('BUTTON');
+    delAllBtn.id = 'del-all';
+    delAllBtn.textContent = 'Borrar productos';
+
+    delAllBtnTD.append(delAllBtn);
+
+    delAllBtnTR.append(delAllBtnTD);
+
+    tablaSeleccionados.append(fragment, delAllBtnTR);
     
   }; //!FUNC-PINTARSELECCIONADOS
+
+
+  const eliminarProducto = (id) => {
+
+    const producto = arrayProductosSeleccionados.find( item => item.id == id);
+
+    if(producto.cantidad > 1){
+
+      producto.cantidad--
+
+      setLocal();
+
+      pintarSeleccionados();
+
+    } else {
+
+      const index = arrayProductosSeleccionados.findIndex( item => item.id == id);
+
+      arrayProductosSeleccionados.splice(index, 1);
+
+      setLocal();
+
+      pintarSeleccionados();
+
+    };
+
+  }; //!FUNC-ELIMINARPRODUCTO
 
 
   const init = () => {
