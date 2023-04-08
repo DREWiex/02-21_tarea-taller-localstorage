@@ -6,67 +6,57 @@
 //* 2) Todo producto que se añada o se elimine del localStorage se verá reflejado automáticamente en otra lista en el propio navegador.
 //* 3) Tendremos un botón para vaciar la lista completa del localStorage.
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener('DOMContentLoaded', () => {
 
 
   //*** VARIABLES ***//
 
-  const listaDeProductos = document.querySelector("#lista-productos");
   const fragment = document.createDocumentFragment();
 
   const arrayProductos = [
-    {
-        id: 1,
-        fruta: 'Plátano'
-    },
-    {
-        id: 2,
-        fruta: 'Fresa'
-    },
-    {
-        id: 3,
-        fruta: 'Coco'
-    },
-    {
-        id: 4,
-        fruta: 'Melón'
-    }
-  ]
+    { id: 'a-1', fruta: 'Plátano' },
+    { id: 'a-2', fruta: 'Fresa' },
+    { id: 'a-3', fruta: 'Coco' },
+    { id: 'a-4', fruta: 'Melón' }
+  ];
 
-  const arrayProductosEnStorage = [];
+  const arrayProductosSeleccionados = JSON.parse(localStorage.getItem('productos')) || [];
+
 
 
   //*** EVENTOS ***//
 
-  listaDeProductos.addEventListener("click", (ev) => {
+  document.addEventListener("click", ({target}) => { //! incompleto
     
-    if(ev.target.classList.contains("agregar")){
-      addProdStorage();
+    if(target.matches('.agregar')){ //* capturo el botón de añadir
+      const id = target.parentElement.id; //* capturo el id del elemento padre (<li> > <button>)
+      addProdStorage(id); //* paso como argumento el atributo id del elemento padre y la función lo compara con la propiedad id de los objetos hasta que coincide y hace el push() en el arrayProductosEncontrados, además de subirlo al localStorage (ver bloque de instrucción de la función)
+      pintarListaDos(); //* pinta en la segunda lista los productos añadidos al localStorage
     }
 
-  });//!EV-AGREGARPROD
-
-
-/*
-  listaDeProductos.addEventListener("click", (ev) => {
-
-    if(ev.target.classList.contains("quitar-todo")){
-      delAllProdStorage();
+    if(target.matches('.quitar')){
+      const id = target.parentElement.id;
+      //delProdStorage(id);
+      //pintarListaDos();
     }
 
-  })//!EV-BORRARTODO
-*/
+    if(target.matches('.quitar-todo')){
+      //localStorage.clear();
+      //pintarListaDos();
+    }
+
+  });//!EV-CLICK
 
 
 
   //*** FUNCIONES ***//
 
-  const pintarProductos = () => {
+  const pintarListaUno = () => {
     
     arrayProductos.forEach((item) => {
         const itemList = document.createElement('LI');
         itemList.id = item.id;
-        itemList.textContent = item.producto;
+        itemList.textContent = item.fruta;
         const addButton = document.createElement('BUTTON');
         addButton.textContent = "Añadir";
         addButton.classList.add('agregar');
@@ -81,57 +71,85 @@ document.addEventListener("DOMContentLoaded", () => {
         fragment.append(itemList);
 
     })
-
+    
     const delAllButton = document.createElement('BUTTON');
     delAllButton.classList.add('quitar-todo');
     delAllButton.textContent = "Borrar todo"
 
-    listaDeProductos.append(fragment, delAllButton);
+    lista1.append(fragment, delAllButton);
 
-  }//!FUNC-PINTARPRODUCTOS
+  }; //!FUNC-PINTARPRODUCTOS
 
 
-  const addProdStorage = () => {
-
-    const captureAddButton = document.querySelectorAll('.agregar');
-
-    //localStorage.setItem("producto", JSON.stringify(arrayProductos))
-
-    console.log('Estoy capturando el botón "Añadir"')
+  const addProdStorage = (id) => {
     
+    const productoEncontrado = arrayProductos.find((item)=> item.id == id);
+    arrayProductosSeleccionados.push(productoEncontrado);
+    setLocal();
 
-  };//!FUNC-ADDPRODSTOR
-
-
-  const delProdStorage = () => {
-
-    const captureDelButton = document.querySelectorAll('.quitar');
-
-    // let productosGuardados = JSON.parse(localStorage.getItem('usuario')) || [];
-
-    console.log('Estoy capturando el botón "Eliminar"')
+  }; //!FUNC-ADDPRODSTOR
 
 
-  };//!FUNC-DELPRODSTOR
+  const delProdStorage = (id) => { //! incompleto
+
+    const productoEncontrado = arrayProductosSeleccionados.find((item)=> item.id == id);
+    localStorage.removeItem('productos');
+
+  }; //!FUNC-DELPRODSTOR
 
 
-  const delAllProdStorage = () => {
+  const pintarListaDos = () => { //? incompleto
+    
+    lista2.innerHTML = '';
+    
+    const productos = getLocal();
+    
+    productos.forEach(({id, fruta}) => { //* destructuración de item (arrayProductosSeleccionados.id, arrayProductosSeleccionados.fruta)
+      const itemList = document.createElement('LI');
+        itemList.id = id;
+        itemList.textContent = fruta;
+        const delButton = document.createElement('BUTTON');
+        delButton.textContent = 'Eliminar';
+        delButton.classList.add('quitar');
+        delButton.setAttribute("data-id", id);
 
-    const captureDelAllButton = document.querySelectorAll('.quitar-todo');
+        itemList.append(delButton);
 
-    //localStorage.clear();
+        fragment.append(itemList);
 
-    console.log('Estoy capturando el botón "Borrar Todo"')
+    })
+    
+    lista2.append(fragment);
 
-
-  };//!FUNC-DELALLPRODSTOR  
-
-
-  pintarProductos();
-
-});//LOAD
+  }; //!FUNC-PINTARLISTADOS
 
 
+  const setLocal = () => {
+
+    localStorage.setItem('productos', JSON.stringify(arrayProductosSeleccionados));
+
+  }; //!FUNC-SETLOCAL
+
+
+  const getLocal = () => {
+
+    return JSON.parse(localStorage.getItem('productos')) || [];
+
+  }; //!FUNC-GETLOCAL
+
+
+  const init = () => {
+
+    pintarListaUno();
+    pintarListaDos(); 
+
+  }; //!FUNC-INIT
+
+
+  init();
+
+  
+});//!LOAD
 
 
 
@@ -141,10 +159,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
-//? const arrayProductos = JSON.parse(localStorage.getItem('cosas')) || [];
-//* añadir producto a array y esa array a la storage…
 
-//! *** APUNTES EXTRA *** //
+
+//*** APUNTES EXTRA ***//
 
 //* Guardar datos: localStorage.setItem('nombre', 'Lydia');
 
@@ -159,3 +176,7 @@ document.addEventListener("DOMContentLoaded", () => {
 //* Guardar objetos en el LocalStorage (JSON.stringify): localStorage.setItem("usuario", JSON.stringify(mi_objeto));
 
 //* Recuperar un objeto del localStorage (JSON.parse): let perfilesGuardados = JSON.parse(localStorage.getItem('usuario')) || [];
+
+//* .find() devuelve el índice del elemento, pero si no lo encuentra devuelve -1.
+
+//* .matches() y .closest() requieren como argumento un selector (de CCS) válido.
