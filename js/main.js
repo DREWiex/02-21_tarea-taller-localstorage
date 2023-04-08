@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const fragment = document.createDocumentFragment();
   const tablaProductos = document.querySelector('#lista-productos');
-  const tablaSeleccionados = document.querySelectorAll('#productos-seleccionados');
+  const tablaSeleccionados = document.querySelector('#productos-seleccionados');
 
   const arrayProductos = [
     { id: 'a-1', fruta: 'Plátano' },
@@ -55,27 +55,41 @@ document.addEventListener('DOMContentLoaded', () => {
   const pintarProductos = () => {
     
     arrayProductos.forEach((item) => {
-      const productosTR = document.createElement('TR');
+      const productoTR = document.createElement('TR');
       const productoTD = document.createElement('TD');
       productoTD.id = item.id;
       productoTD.textContent = item.fruta;
-      const buttonTD = document.createElement('TD');
+      const addBtnTD = document.createElement('TD');
       const addBtn = document.createElement('BUTTON');
       addBtn.textContent = "Añadir";
       addBtn.classList.add('add');
       addBtn.dataset['id'] = item.id;
 
-      buttonTD.append(addBtn);
+      addBtnTD.append(addBtn);
 
-      productosTR.append(productoTD, buttonTD);
+      productoTR.append(productoTD, addBtnTD);
 
-      fragment.append(productosTR);
+      fragment.append(productoTR);
 
     });
 
     tablaProductos.append(fragment);
     
   }; //!FUNC-PINTARPRODUCTOS
+
+
+  const setLocal = () => {
+
+    localStorage.setItem('productos', JSON.stringify(arrayProductosSeleccionados));
+
+  }; //!FUNC-SETLOCAL
+
+
+  const getLocal = () => {
+
+    return JSON.parse(localStorage.getItem('productos')) || [];
+
+  }; //!FUNC-GETLOCAL
 
 
   const almacenarProducto = (id) => {
@@ -95,48 +109,38 @@ document.addEventListener('DOMContentLoaded', () => {
   // }; //!FUNC-DELPRODSTOR
 
 
-  const pintarListaDos = (id) => { //? incompleto
+  const pintarSeleccionados = () => { //? incompleto
 
     tablaSeleccionados.innerHTML = '';
         
-    // productos.forEach(({id, fruta}) => { //* destructuración de item (arrayProductosSeleccionados.id, arrayProductosSeleccionados.fruta)
-    //   const itemList = document.createElement('LI');
-    //     itemList.id = id;
-    //     itemList.textContent = fruta;
-    //     const delButton = document.createElement('BUTTON');
-    //     delButton.textContent = 'Eliminar';
-    //     delButton.classList.add('quitar');
-    //     delButton.setAttribute("data-id", id);
+    arrayProductosSeleccionados.forEach((item) => {
+      const seleccionadoTR = document.createElement('TR');
+      const seleccionadoTD = document.createElement('TD');
+      seleccionadoTD.id = item.id;
+      seleccionadoTD.textContent = item.fruta;
+      const delBtnTD = document.createElement('TD');
+      const delBtn = document.createElement('BUTTON');
+      delBtn.classList.add('quitar');
+      delBtn.dataset['id'] = item.id;
+      delBtn.textContent = 'Eliminar';
 
-    //     itemList.append(delButton);
+      delBtnTD.append(delBtn);
 
-    //     fragment.append(itemList);
+      seleccionadoTR.append(seleccionadoTD, delBtnTD);
 
-    // })
+      fragment.append(seleccionadoTR);
+
+    });
+
+    tablaSeleccionados.append(fragment);
     
-    // lista2.append(fragment);
-
-  }; //!FUNC-PINTARLISTADOS
-
-
-  const setLocal = () => {
-
-    localStorage.setItem('productos', JSON.stringify(arrayProductosSeleccionados));
-
-  }; //!FUNC-SETLOCAL
-
-
-  const getLocal = () => {
-
-    return JSON.parse(localStorage.getItem('productos')) || [];
-
-  }; //!FUNC-GETLOCAL
+  }; //!FUNC-PINTARSELECCIONADOS
 
 
   const init = () => {
 
     pintarProductos();
-    pintarListaDos(); 
+    pintarSeleccionados(); 
 
   }; //!FUNC-INIT
 
